@@ -1,0 +1,69 @@
+POST http://localhost:8888/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "encargado",
+  "password": "123"
+}
+
+###
+POST http://localhost:8888/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "cajero",
+  "password": "123"
+}
+
+###
+POST http://localhost:8888/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "cajero_nuevo",
+  "password": "123",
+  "rol": "CAJERO"
+}
+
+###
+GET http://localhost:8888/api/auth/me
+Authorization: Bearer PEGA_AQUI_TU_TOKEN
+
+###
+GET http://localhost:8888/api/productos
+Authorization: Bearer PEGA_AQUI_TU_TOKEN
+
+###
+POST http://localhost:8888/api/productos
+Content-Type: application/json
+Authorization: Bearer PEGA_AQUI_TU_TOKEN
+
+{
+  "nombre": "Aceite Capri 1L",
+  "descripcion": "Aceite vegetal comestible",
+  "precio": 8.50,
+  "stock": 40,
+  "categoria": "Abarrotes"
+}
+
+###
+POST http://localhost:8888/api/ventas
+Content-Type: application/json
+Authorization: Bearer PEGA_AQUI_TU_TOKEN
+
+{
+  "items": [
+    {
+      "productoId": 1,
+      "cantidad": 2
+    }
+  ]
+}
+
+###
+GET http://localhost:8888/api/ventas/1/boleta
+Authorization: Bearer PEGA_AQUI_TU_TOKEN
+
+###
+GET http://localhost:8888/api/ventas
+Authorization: Bearer PEGA_AQUI_TU_TOKEN

@@ -1,0 +1,18 @@
+# IDEs y editores
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Compilados y artefactos
+**/target/
+**/build/
+**/dist/
+.artifacts/
+
+# Logs y temporales
+*.log
+
+# Node (Frontend)
+**/node_modules/

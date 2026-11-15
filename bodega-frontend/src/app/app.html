@@ -1,0 +1,173 @@
+<div *ngIf="!isLoggedIn" style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f6f9;">
+  <!-- VISTA DE LOGIN -->
+  <div style="background: #ffffff; padding: 40px; border-radius: 12px; width: 380px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;">
+    <h2 style="color: #2c3e50; margin-bottom: 20px;">Iniciar Sesión</h2>
+    <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 20px;">Sistema de Bodega / Minimarket</p>
+
+    <div style="margin-bottom: 15px; text-align: left;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #34495e;">Usuario:</label>
+      <input [(ngModel)]="loginData.username" placeholder="Ej. encargado o cajero" style="width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px;" />
+    </div>
+
+    <div style="margin-bottom: 20px; text-align: left;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #34495e;">Contraseña:</label>
+      <input [(ngModel)]="loginData.password" type="password" placeholder="Contraseña" style="width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px;" />
+    </div>
+
+    <button (click)="iniciarSesion()" style="background: #2980b9; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold;">Ingresar</button>
+  </div>
+</div>
+
+<!-- VISTA PRINCIPAL CON SIDEBAR -->
+<div *ngIf="isLoggedIn" style="display: flex; height: 100vh; font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; overflow: hidden;">
+
+  <!-- SIDEBAR (IZQUIERDA) -->
+  <div style="width: 260px; background: #2c3e50; color: white; display: flex; flex-direction: column; box-shadow: 2px 0 5px rgba(0,0,0,0.1);">
+    <div style="padding: 20px; border-bottom: 1px solid #34495e; text-align: center;">
+      <h3 style="margin: 0; color: #ecf0f1; font-size: 18px;">🛒 Minimarket</h3>
+      <p style="margin: 5px 0 0 0; font-size: 12px; color: #bdc3c7;">{{ currentUser?.username }} ({{ currentUser?.rol }})</p>
+    </div>
+
+    <div style="flex: 1; padding: 20px 10px; display: flex; flex-direction: column; gap: 10px;">
+      <button (click)="cambiarVista('menu')" [style.background]="currentView === 'menu' ? '#1abc9c' : 'transparent'" style="color: white; border: none; padding: 12px 15px; text-align: left; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">
+        🏠 Menú Principal
+      </button>
+
+      <button (click)="cambiarVista('stock')" [style.background]="currentView === 'stock' ? '#1abc9c' : 'transparent'" style="color: white; border: none; padding: 12px 15px; text-align: left; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">
+        📦 Control de Stock
+      </button>
+
+      <button *ngIf="currentUser?.rol === 'ROLE_ENCARGADO'" (click)="cambiarVista('ventas')" [style.background]="currentView === 'ventas' ? '#1abc9c' : 'transparent'" style="color: white; border: none; padding: 12px 15px; text-align: left; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">
+        🧾 Historial de Ventas
+      </button>
+
+      <button *ngIf="currentUser?.rol === 'ROLE_CAJERO'" (click)="cambiarVista('caja')" [style.background]="currentView === 'caja' ? '#1abc9c' : 'transparent'" style="color: white; border: none; padding: 12px 15px; text-align: left; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">
+        🛒 Registrar Venta (Caja)
+      </button>
+    </div>
+
+    <div style="padding: 20px; border-top: 1px solid #34495e;">
+      <button (click)="cerrarSesion()" style="background: #c0392b; color: white; border: none; padding: 10px; width: 100%; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        🚪 Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL (DERECHA) -->
+  <div style="flex: 1; padding: 30px; overflow-y: auto;">
+
+    <!-- VISTA: MENÚ PRINCIPAL -->
+    <div *ngIf="currentView === 'menu'">
+      <h2 style="color: #2c3e50; margin-top: 0;">Bienvenido al Sistema, {{ currentUser?.username }}</h2>
+      <p style="color: #7f8c8d;">Selecciona una opción en el menú lateral izquierdo para comenzar a gestionar el minimarket.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px;">
+        <div (click)="cambiarVista('stock')" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 5px solid #2980b9;">
+          <h3 style="margin-top: 0; color: #2c3e50;">📦 Control de Stock y Existencias</h3>
+          <p style="color: #7f8c8d; margin-bottom: 0;">Revisa los productos disponibles y el inventario en tiempo real.</p>
+        </div>
+
+        <div *ngIf="currentUser?.rol === 'ROLE_ENCARGADO'" (click)="cambiarVista('ventas')" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 5px solid #8e44ad;">
+          <h3 style="margin-top: 0; color: #2c3e50;">🧾 Historial de Ventas</h3>
+          <p style="color: #7f8c8d; margin-bottom: 0;">Verifica las ventas realizadas y reimprime boletas electrónicas con IGV 18%.</p>
+        </div>
+
+        <div *ngIf="currentUser?.rol === 'ROLE_CAJERO'" (click)="cambiarVista('caja')" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; border-left: 5px solid #27ae60;">
+          <h3 style="margin-top: 0; color: #2c3e50;">🛒 Registrar Venta (Caja)</h3>
+          <p style="color: #7f8c8d; margin-bottom: 0;">Registra compras de mostrador, calcula totales con IGV y descuenta stock.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA: CONTROL DE STOCK -->
+    <div *ngIf="currentView === 'stock'">
+      <h2 style="color: #2c3e50; margin-top: 0;">Control de Stock y Existencias</h2>
+
+      <!-- Formulario para Cajero -->
+      <div *ngIf="currentUser?.rol === 'ROLE_CAJERO'" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h3 style="margin-top: 0; color: #34495e;">Registrar Nuevo Producto</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px;">
+          <input [(ngModel)]="nuevoProducto.nombre" placeholder="Nombre del producto" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          <input [(ngModel)]="nuevoProducto.categoria" placeholder="Categoría" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          <input [(ngModel)]="nuevoProducto.descripcion" placeholder="Descripción" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          <input [(ngModel)]="nuevoProducto.precio" type="number" placeholder="Precio (S/)" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          <input [(ngModel)]="nuevoProducto.stock" type="number" placeholder="Stock inicial" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+        <button (click)="guardarProducto()" style="background: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">Guardar Producto</button>
+      </div>
+
+      <!-- Tabla de Productos -->
+      <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <thead>
+          <tr style="background: #2c3e50; color: white; text-align: left;">
+            <th style="padding: 12px;">ID</th>
+            <th style="padding: 12px;">Nombre</th>
+            <th style="padding: 12px;">Categoría</th>
+            <th style="padding: 12px;">Precio</th>
+            <th style="padding: 12px;">Stock Actual</th>
+            <th *ngIf="currentUser?.rol === 'ROLE_CAJERO'" style="padding: 12px;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of productos" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 12px;">{{ p.id }}</td>
+            <td style="padding: 12px;">{{ p.nombre }}</td>
+            <td style="padding: 12px;">{{ p.categoria }}</td>
+            <td style="padding: 12px;">S/ {{ p.precio | number:'1.2-2' }}</td>
+            <td style="padding: 12px;"><b>{{ p.stock }}</b> unidades</td>
+            <td *ngIf="currentUser?.rol === 'ROLE_CAJERO'" style="padding: 12px;">
+              <button (click)="eliminar(p.id!)" style="background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VISTA: HISTORIAL DE VENTAS (ENCARGADO) -->
+    <div *ngIf="currentView === 'ventas'">
+      <h2 style="color: #2c3e50; margin-top: 0;">Historial y Verificación de Ventas</h2>
+      <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <thead>
+          <tr style="background: #8e44ad; color: white; text-align: left;">
+            <th style="padding: 12px;">ID Venta</th>
+            <th style="padding: 12px;">Fecha y Hora</th>
+            <th style="padding: 12px;">Total Final</th>
+            <th style="padding: 12px;">Boleta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of ventas" style="border-bottom: 1px solid #eee;">
+            <td style="padding: 12px;">{{ v.id }}</td>
+            <td style="padding: 12px;">{{ v.fecha | date:'medium' }}</td>
+            <td style="padding: 12px;"><b>S/ {{ v.total | number:'1.2-2' }}</b></td>
+            <td style="padding: 12px;">
+              <button (click)="verBoleta(v.id)" style="background: #8e44ad; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Imprimir Boleta</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VISTA: REGISTRAR VENTA / CAJA (CAJERO) -->
+    <div *ngIf="currentView === 'caja'">
+      <h2 style="color: #2c3e50; margin-top: 0;">Registrar Venta (Caja)</h2>
+      <div style="background: white; padding: 25px; border-radius: 8px; max-width: 500px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #34495e;">Seleccionar Producto:</label>
+          <select [(ngModel)]="ventaForm.productoId" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <option *ngFor="let p of productos" [value]="p.id">{{ p.nombre }} - S/ {{ p.precio }} (Stock: {{ p.stock }})</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #34495e;">Cantidad:</label>
+          <input [(ngModel)]="ventaForm.cantidad" type="number" min="1" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+        </div>
+
+        <button (click)="realizarVenta()" style="background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%;">Procesar Venta (Aplica IGV 18%)</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
