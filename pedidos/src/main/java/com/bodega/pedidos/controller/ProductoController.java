@@ -22,6 +22,14 @@ public class ProductoController {
         return productoService.listarProductos();
     }
 
+    @GetMapping("/buscar")
+    public List<Producto> buscar(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) Double precioMax) {
+        return productoService.buscarProductos(nombre, categoria, precioMax);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
         return productoService.obtenerPorId(id)

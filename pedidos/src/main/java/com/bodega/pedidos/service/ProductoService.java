@@ -17,6 +17,10 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    public List<Producto> buscarProductos(String nombre, String categoria, Double precioMax) {
+        return productoRepository.buscarPorFiltros(nombre, categoria, precioMax);
+    }
+
     public Optional<Producto> obtenerPorId(Long id) {
         return productoRepository.findById(id);
     }
