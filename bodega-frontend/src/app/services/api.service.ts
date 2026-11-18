@@ -19,6 +19,10 @@ export class ApiService {
     return this.http.get<Producto[]>(`${this.baseUrl}/productos`);
   }
 
+  getProductosPaginados(page: number = 0, size: number = 5): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/productos/paginado?page=${page}&size=${size}`);
+  }
+
   crearProducto(producto: Producto): Observable<Producto> {
     return this.http.post<Producto>(`${this.baseUrl}/productos`, producto);
   }

@@ -121,6 +121,21 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- CONTROLES DE PAGINACIÓN -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <span style="color: #7f8c8d; font-size: 14px;">
+          Mostrando página <b>{{ paginaActual + 1 }}</b> de <b>{{ totalPaginas || 1 }}</b> (Total: {{ totalElementos }} productos)
+        </span>
+        <div style="display: flex; gap: 10px;">
+          <button (click)="paginaAnterior()" [disabled]="paginaActual === 0" [style.opacity]="paginaActual === 0 ? '0.5' : '1'" style="background: #2c3e50; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+            ◀ Anterior
+          </button>
+          <button (click)="paginaSiguiente()" [disabled]="paginaActual >= totalPaginas - 1" [style.opacity]="paginaActual >= totalPaginas - 1 ? '0.5' : '1'" style="background: #2c3e50; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+            Siguiente ▶
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- VISTA: HISTORIAL DE VENTAS (ENCARGADO) -->

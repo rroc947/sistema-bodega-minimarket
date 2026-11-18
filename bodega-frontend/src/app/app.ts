@@ -26,6 +26,11 @@ export class App implements OnInit {
   ventas: any[] = [];
   nuevoProducto: Producto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '' };
 
+  paginaActual: number = 0;
+  tamanoPagina: number = 5;
+  totalPaginas: number = 1;
+  totalElementos: number = 0;
+
   constructor(private apiService: ApiService) {}
 
   ngOnInit() {
@@ -81,10 +86,28 @@ export class App implements OnInit {
   }
 
   cargarProductos() {
-    this.apiService.getProductos().subscribe({
-      next: (data) => (this.productos = data),
-      error: (err) => console.error('Error al cargar productos', err)
+    this.apiService.getProductosPaginados(this.paginaActual, this.tamanoPagina).subscribe({
+      next: (data) => {
+        this.productos = data.content;
+        this.totalPaginas = data.totalPages;
+        this.totalElementos = data.totalElements;
+      },
+      error: (err) => console.error('Error al cargar productos paginados', err)
     });
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 0) {
+      this.paginaActual--;
+      this.cargarProductos();
+    }
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas - 1) {
+      this.paginaActual++;
+      this.cargarProductos();
+    }
   }
 
   cargarVentas() {
