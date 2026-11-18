@@ -26,8 +26,17 @@ public class AuthController {
     private JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registrar(@Valid @RequestBody Usuario usuario) {
+    public ResponseEntity<?> registrar(@Valid @RequestBody Usuario usuario, Authentication authentication) {
         try {
+            boolean esEncargado = authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ENCARGADO") || a.getAuthority().equals("ENCARGADO"));
+
+            String rolSolicitado = usuario.getRol() != null ? usuario.getRol().toUpperCase() : "";
+            if ((rolSolicitado.contains("ENCARGADO") || rolSolicitado.contains("ADMIN")) && !esEncargado) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("No tienes permisos para registrar usuarios con rol ENCARGADO. Se requiere estar autenticado como ENCARGADO.");
+            }
+
             Usuario nuevo = usuarioService.registrar(usuario);
             String token = jwtService.generateToken(nuevo.getUsername(), nuevo.getRol());
             AuthResponseDTO response = AuthResponseDTO.builder()
