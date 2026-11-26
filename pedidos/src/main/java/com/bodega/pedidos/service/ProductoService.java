@@ -44,6 +44,9 @@ public class ProductoService {
         if (producto.getMarca() != null) {
             producto.setMarca(producto.getMarca().trim());
         }
+        if (producto.getImagenUrl() != null) {
+            producto.setImagenUrl(producto.getImagenUrl().trim());
+        }
         return productoRepository.save(producto);
     }
 
@@ -61,7 +64,7 @@ public class ProductoService {
             throw new RuntimeException("Error: Ya existe otro producto registrado con el nombre '" + nuevoNombre + "'. No se permiten nombres duplicados.");
         }
 
-        // Se permite editar nombre, precio, marca, categoría y descripción, pero NO se altera el stock
+        // Se permite editar nombre, precio, marca, categoría, descripción e imagenUrl, pero NO se altera el stock
         producto.setNombre(nuevoNombre);
         if (productoDetalles.getPrecio() != null && productoDetalles.getPrecio() > 0) {
             producto.setPrecio(productoDetalles.getPrecio());
@@ -69,6 +72,7 @@ public class ProductoService {
         producto.setMarca(productoDetalles.getMarca() != null ? productoDetalles.getMarca().trim() : null);
         producto.setDescripcion(productoDetalles.getDescripcion() != null ? productoDetalles.getDescripcion().trim() : null);
         producto.setCategoria(productoDetalles.getCategoria() != null ? productoDetalles.getCategoria().trim() : null);
+        producto.setImagenUrl(productoDetalles.getImagenUrl() != null ? productoDetalles.getImagenUrl().trim() : null);
         // El stock se mantiene inalterable: no se toma productoDetalles.getStock()
         return productoRepository.save(producto);
     }

@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/ventas").hasAnyAuthority("ROLE_ADMINISTRADOR", "ADMINISTRADOR", "ROLE_ENCARGADO", "ENCARGADO")
+                .requestMatchers(HttpMethod.GET, "/api/ventas/cierre-caja").hasAnyAuthority("ROLE_ADMINISTRADOR", "ADMINISTRADOR", "ROLE_ENCARGADO", "ENCARGADO")
                 .requestMatchers(HttpMethod.GET, "/api/ventas/*/boleta").hasAnyAuthority("ROLE_ADMINISTRADOR", "ADMINISTRADOR", "ROLE_ENCARGADO", "ENCARGADO", "ROLE_CAJERO", "CAJERO")
                 .requestMatchers(HttpMethod.POST, "/api/ventas/**").hasAnyAuthority("ROLE_CAJERO", "CAJERO", "ROLE_ENCARGADO", "ENCARGADO", "ROLE_ADMINISTRADOR", "ADMINISTRADOR")
                 .requestMatchers(HttpMethod.GET, "/api/productos/**").authenticated()

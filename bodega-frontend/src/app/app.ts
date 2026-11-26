@@ -24,9 +24,12 @@ export class App implements OnInit {
 
   productos: Producto[] = [];
   ventas: any[] = [];
-  nuevoProducto: Producto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '', marca: '' };
+  nuevoProducto: Producto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '', marca: '', imagenUrl: '' };
 
   editandoProducto: Producto | null = null;
+  cierreCajaData: any = null;
+  fechaCierre: string = new Date().toISOString().substring(0, 10);
+  productoSeleccionadoVenta: Producto | null = null;
 
   nuevoUsuario = {
     username: '',
@@ -88,12 +91,16 @@ export class App implements OnInit {
 
   cambiarVista(vista: string) {
     this.currentView = vista;
+    if (vista === 'cierre' && (this.currentUser?.rol === 'ROLE_ENCARGADO' || this.currentUser?.rol === 'ROLE_ADMINISTRADOR')) {
+      this.cargarCierreCaja();
+    }
   }
 
   cargarDatos() {
     this.cargarProductos();
-    if (this.currentUser?.rol === 'ROLE_ENCARGADO') {
+    if (this.currentUser?.rol === 'ROLE_ENCARGADO' || this.currentUser?.rol === 'ROLE_ADMINISTRADOR') {
       this.cargarVentas();
+      this.cargarCierreCaja();
     }
   }
 
@@ -129,6 +136,28 @@ export class App implements OnInit {
     });
   }
 
+  cargarCierreCaja() {
+    this.apiService.getCierreCaja(this.fechaCierre).subscribe({
+      next: (data) => {
+        this.cierreCajaData = data;
+      },
+      error: (err) => console.error('Error al cargar cierre de caja', err)
+    });
+  }
+
+  onSelectProductoVenta() {
+    if (this.ventaForm.productoId) {
+      this.productoSeleccionadoVenta = this.productos.find(p => p.id === Number(this.ventaForm.productoId)) || null;
+    } else {
+      this.productoSeleccionadoVenta = null;
+    }
+  }
+
+  seleccionarProductoParaVender(p: Producto) {
+    this.ventaForm.productoId = p.id || null;
+    this.productoSeleccionadoVenta = p;
+  }
+
   guardarProducto() {
     if (!this.nuevoProducto.nombre || !this.nuevoProducto.precio || this.nuevoProducto.precio <= 0) {
       alert('Por favor ingrese un nombre y un precio válido.');
@@ -137,7 +166,7 @@ export class App implements OnInit {
     this.apiService.crearProducto(this.nuevoProducto).subscribe({
       next: (res) => {
         this.cargarProductos();
-        this.nuevoProducto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '', marca: '' };
+        this.nuevoProducto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '', marca: '', imagenUrl: '' };
         alert(`¡Producto registrado exitosamente: ${res.nombre}!`);
       },
       error: (err) => alert('Error al guardar: ' + (err.error?.message || err.error || 'Verifique los datos'))

@@ -34,6 +34,15 @@ public class VentaController {
         }
     }
 
+    @GetMapping("/cierre-caja")
+    public ResponseEntity<?> obtenerCierreCaja(
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fecha) {
+        if (fecha == null) {
+            fecha = java.time.LocalDate.now();
+        }
+        return ResponseEntity.ok(ventaService.obtenerCierreCajaDiario(fecha));
+    }
+
     @PostMapping
     public ResponseEntity<?> registrarVenta(@Valid @RequestBody VentaRequestDTO request) {
         try {

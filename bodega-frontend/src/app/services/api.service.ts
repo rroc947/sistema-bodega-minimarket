@@ -39,6 +39,11 @@ export class ApiService {
     return this.http.get<any[]>(`${this.baseUrl}/ventas`);
   }
 
+  getCierreCaja(fecha?: string): Observable<any> {
+    const params = fecha ? `?fecha=${fecha}` : '';
+    return this.http.get<any>(`${this.baseUrl}/ventas/cierre-caja${params}`);
+  }
+
   registrarVenta(venta: { items: { productoId: number; cantidad: number }[] }): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/ventas`, venta);
   }
