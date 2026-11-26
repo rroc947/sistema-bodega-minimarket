@@ -20,7 +20,15 @@ public class Usuario {
     @Column(nullable = false)
     private String password;
     
-    @NotBlank(message = "El rol es obligatorio (ENCARGADO o CAJERO)")
+    @NotBlank(message = "El rol es obligatorio (ADMINISTRADOR, ENCARGADO o CAJERO)")
     @Column(nullable = false)
-    private String rol; // "ENCARGADO" o "CAJERO"
+    private String rol; // "ROLE_ADMINISTRADOR", "ROLE_ENCARGADO", "ROLE_CAJERO"
+
+    private String nombres;
+
+    private Integer edad;
+
+    private java.time.LocalDate fechaInicio;
+
+    private java.time.LocalDate fechaFin;
 }

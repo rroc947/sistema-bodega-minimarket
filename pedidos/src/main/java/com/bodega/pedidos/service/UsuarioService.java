@@ -35,6 +35,16 @@ public class UsuarioService {
         if (!passwordEncoder.matches(password, usuario.getPassword())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
+
+        // Validación de vigencia de labores por fechas
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        if (usuario.getFechaInicio() != null && hoy.isBefore(usuario.getFechaInicio())) {
+            throw new RuntimeException("Su periodo de labores aún no inicia. Acceso denegado hasta el " + usuario.getFechaInicio());
+        }
+        if (usuario.getFechaFin() != null && hoy.isAfter(usuario.getFechaFin())) {
+            throw new RuntimeException("Su periodo de labores ha vencido el " + usuario.getFechaFin() + ". Su cuenta ya no tiene acceso al sistema.");
+        }
+
         return usuario;
     }
 }

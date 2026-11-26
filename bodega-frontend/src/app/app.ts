@@ -28,6 +28,16 @@ export class App implements OnInit {
 
   editandoProducto: Producto | null = null;
 
+  nuevoUsuario = {
+    username: '',
+    password: '',
+    rol: 'CAJERO',
+    nombres: '',
+    edad: null as number | null,
+    fechaInicio: '',
+    fechaFin: ''
+  };
+
   paginaActual: number = 0;
   tamanoPagina: number = 5;
   totalPaginas: number = 1;
@@ -155,6 +165,46 @@ export class App implements OnInit {
         this.cargarProductos();
       },
       error: (err) => alert('Error al actualizar: ' + (err.error?.message || err.error || 'Verifique los datos'))
+    });
+  }
+
+  crearUsuario() {
+    if (!this.nuevoUsuario.username || !this.nuevoUsuario.password || !this.nuevoUsuario.nombres) {
+      alert('Por favor complete los campos obligatorios: Usuario, Contraseña y Nombres.');
+      return;
+    }
+
+    if (this.nuevoUsuario.fechaInicio && this.nuevoUsuario.fechaFin) {
+      if (this.nuevoUsuario.fechaFin < this.nuevoUsuario.fechaInicio) {
+        alert('La fecha de fin de labores no puede ser menor a la fecha de inicio.');
+        return;
+      }
+    }
+
+    const payload = {
+      username: this.nuevoUsuario.username.trim(),
+      password: this.nuevoUsuario.password,
+      rol: this.nuevoUsuario.rol,
+      nombres: this.nuevoUsuario.nombres.trim(),
+      edad: this.nuevoUsuario.edad,
+      fechaInicio: this.nuevoUsuario.fechaInicio || null,
+      fechaFin: this.nuevoUsuario.fechaFin || null
+    };
+
+    this.apiService.registrar(payload).subscribe({
+      next: (res) => {
+        alert(`¡Usuario ${res.username} (${res.rol}) registrado con éxito con vigencia de labores!`);
+        this.nuevoUsuario = {
+          username: '',
+          password: '',
+          rol: 'CAJERO',
+          nombres: '',
+          edad: null,
+          fechaInicio: '',
+          fechaFin: ''
+        };
+      },
+      error: (err) => alert('Error al registrar usuario: ' + (err.error || 'Verifique los datos ingresados'))
     });
   }
 

@@ -26,6 +26,17 @@ public class PedidosApplication {
 	@Bean
 	CommandLineRunner initDatabase(UsuarioRepository usuarioRepository, ProductoRepository productoRepository, VentaRepository ventaRepository) {
 		return args -> {
+			if (usuarioRepository.findByUsername("administrador").isEmpty()) {
+				Usuario admin = new Usuario();
+				admin.setUsername("administrador");
+				admin.setPassword("123");
+				admin.setRol("ROLE_ADMINISTRADOR");
+				admin.setNombres("Administrador del Sistema");
+				admin.setEdad(35);
+				admin.setFechaInicio(java.time.LocalDate.now());
+				usuarioRepository.save(admin);
+			}
+
 			if (usuarioRepository.findByUsername("encargado").isEmpty()) {
 				Usuario encargado = new Usuario();
 				encargado.setUsername("encargado");

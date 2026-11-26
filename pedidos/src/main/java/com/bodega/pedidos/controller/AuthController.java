@@ -28,13 +28,24 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registrar(@Valid @RequestBody Usuario usuario, Authentication authentication) {
         try {
-            boolean esEncargado = authentication != null && authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ENCARGADO") || a.getAuthority().equals("ENCARGADO"));
+            boolean esAdmin = authentication != null && authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR") || a.getAuthority().equals("ADMINISTRADOR")
+                                || a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ADMIN"));
 
             String rolSolicitado = usuario.getRol() != null ? usuario.getRol().toUpperCase() : "";
-            if ((rolSolicitado.contains("ENCARGADO") || rolSolicitado.contains("ADMIN")) && !esEncargado) {
+            
+            // Si intenta crear roles de ENCARGADO, CAJERO o ADMINISTRADOR, solo el ADMINISTRADOR puede hacerlo
+            if (!esAdmin) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("No tienes permisos para registrar usuarios con rol ENCARGADO. Se requiere estar autenticado como ENCARGADO.");
+                        .body("Acceso denegado: Solo el usuario ADMINISTRADOR tiene permisos para crear usuarios (Encargados y Cajeros).");
+            }
+
+            // Validación de coherencia de fechas si fueron enviadas
+            if (usuario.getFechaInicio() != null && usuario.getFechaFin() != null) {
+                if (usuario.getFechaFin().isBefore(usuario.getFechaInicio())) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body("La fecha de fin de labores no puede ser anterior a la fecha de inicio.");
+                }
             }
 
             Usuario nuevo = usuarioService.registrar(usuario);
