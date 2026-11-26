@@ -41,8 +41,9 @@ export class App implements OnInit {
     fechaFin: ''
   };
 
+  cargandoProductos: boolean = false;
   paginaActual: number = 0;
-  tamanoPagina: number = 5;
+  tamanoPagina: number = 8;
   totalPaginas: number = 1;
   totalElementos: number = 0;
 
@@ -105,25 +106,30 @@ export class App implements OnInit {
   }
 
   cargarProductos() {
+    this.cargandoProductos = true;
     this.apiService.getProductosPaginados(this.paginaActual, this.tamanoPagina).subscribe({
       next: (data) => {
         this.productos = data.content;
         this.totalPaginas = data.totalPages;
         this.totalElementos = data.totalElements;
+        this.cargandoProductos = false;
       },
-      error: (err) => console.error('Error al cargar productos paginados', err)
+      error: (err) => {
+        console.error('Error al cargar productos paginados', err);
+        this.cargandoProductos = false;
+      }
     });
   }
 
   paginaAnterior() {
-    if (this.paginaActual > 0) {
+    if (this.paginaActual > 0 && !this.cargandoProductos) {
       this.paginaActual--;
       this.cargarProductos();
     }
   }
 
   paginaSiguiente() {
-    if (this.paginaActual < this.totalPaginas - 1) {
+    if (this.paginaActual < this.totalPaginas - 1 && !this.cargandoProductos) {
       this.paginaActual++;
       this.cargarProductos();
     }
