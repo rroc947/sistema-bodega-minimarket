@@ -32,40 +32,43 @@ public class ProductoService {
     }
 
     public Producto guardarProducto(Producto producto) {
-        Optional<Producto> existente = productoRepository.findByNombreIgnoreCase(producto.getNombre().trim());
-        if (existente.isPresent()) {
-            Producto prod = existente.get();
-            // Si ya existe el producto con ese nombre, se recarga el stock
-            prod.setStock(prod.getStock() + (producto.getStock() != null ? producto.getStock() : 0));
-            if (producto.getPrecio() != null && producto.getPrecio() > 0) {
-                prod.setPrecio(producto.getPrecio());
-            }
-            if (producto.getMarca() != null && !producto.getMarca().trim().isEmpty()) {
-                prod.setMarca(producto.getMarca().trim());
-            }
-            if (producto.getCategoria() != null && !producto.getCategoria().trim().isEmpty()) {
-                prod.setCategoria(producto.getCategoria().trim());
-            }
-            if (producto.getDescripcion() != null && !producto.getDescripcion().trim().isEmpty()) {
-                prod.setDescripcion(producto.getDescripcion().trim());
-            }
-            return productoRepository.save(prod);
+        if (producto.getNombre() == null || producto.getNombre().trim().isEmpty()) {
+            throw new RuntimeException("El nombre del producto no puede estar vacío");
         }
-        producto.setNombre(producto.getNombre().trim());
+        String nombreLimpio = producto.getNombre().trim();
+        Optional<Producto> existente = productoRepository.findByNombreIgnoreCase(nombreLimpio);
+        if (existente.isPresent()) {
+            throw new RuntimeException("Error: Ya existe un producto registrado con el nombre '" + nombreLimpio + "'. No se permiten nombres duplicados.");
+        }
+        producto.setNombre(nombreLimpio);
+        if (producto.getMarca() != null) {
+            producto.setMarca(producto.getMarca().trim());
+        }
         return productoRepository.save(producto);
     }
 
     public Producto actualizarProducto(Long id, Producto productoDetalles) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+
+        if (productoDetalles.getNombre() == null || productoDetalles.getNombre().trim().isEmpty()) {
+            throw new RuntimeException("El nombre del producto no puede estar vacío");
+        }
+
+        String nuevoNombre = productoDetalles.getNombre().trim();
+        Optional<Producto> conMismoNombre = productoRepository.findByNombreIgnoreCase(nuevoNombre);
+        if (conMismoNombre.isPresent() && !conMismoNombre.get().getId().equals(id)) {
+            throw new RuntimeException("Error: Ya existe otro producto registrado con el nombre '" + nuevoNombre + "'. No se permiten nombres duplicados.");
+        }
+
         // Se permite editar nombre, precio, marca, categoría y descripción, pero NO se altera el stock
-        producto.setNombre(productoDetalles.getNombre());
+        producto.setNombre(nuevoNombre);
         if (productoDetalles.getPrecio() != null && productoDetalles.getPrecio() > 0) {
             producto.setPrecio(productoDetalles.getPrecio());
         }
-        producto.setMarca(productoDetalles.getMarca());
-        producto.setDescripcion(productoDetalles.getDescripcion());
-        producto.setCategoria(productoDetalles.getCategoria());
+        producto.setMarca(productoDetalles.getMarca() != null ? productoDetalles.getMarca().trim() : null);
+        producto.setDescripcion(productoDetalles.getDescripcion() != null ? productoDetalles.getDescripcion().trim() : null);
+        producto.setCategoria(productoDetalles.getCategoria() != null ? productoDetalles.getCategoria().trim() : null);
         // El stock se mantiene inalterable: no se toma productoDetalles.getStock()
         return productoRepository.save(producto);
     }

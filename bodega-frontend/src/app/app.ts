@@ -138,7 +138,7 @@ export class App implements OnInit {
       next: (res) => {
         this.cargarProductos();
         this.nuevoProducto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '', marca: '' };
-        alert(`¡Operación exitosa! Producto: ${res.nombre} (Stock actual: ${res.stock})`);
+        alert(`¡Producto registrado exitosamente: ${res.nombre}!`);
       },
       error: (err) => alert('Error al guardar: ' + (err.error?.message || err.error || 'Verifique los datos'))
     });

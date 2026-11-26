@@ -16,7 +16,7 @@ public class Producto {
     private Long id;
     
     @NotBlank(message = "El nombre del producto no puede estar vacío")
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nombre;
     
     private String descripcion;
