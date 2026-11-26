@@ -42,9 +42,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/ventas/*/boleta").hasAnyAuthority("ROLE_ENCARGADO", "ENCARGADO", "ROLE_CAJERO", "CAJERO")
                 .requestMatchers(HttpMethod.POST, "/api/ventas/**").hasAnyAuthority("ROLE_CAJERO", "CAJERO", "ROLE_ENCARGADO", "ENCARGADO")
                 .requestMatchers(HttpMethod.GET, "/api/productos/**").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/productos/**").hasAnyAuthority("ROLE_CAJERO", "CAJERO", "ROLE_ENCARGADO", "ENCARGADO")
-                .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasAnyAuthority("ROLE_CAJERO", "CAJERO", "ROLE_ENCARGADO", "ENCARGADO")
-                .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasAnyAuthority("ROLE_CAJERO", "CAJERO", "ROLE_ENCARGADO", "ENCARGADO")
+                .requestMatchers(HttpMethod.POST, "/api/productos/**").hasAnyAuthority("ROLE_ENCARGADO", "ENCARGADO")
+                .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasAnyAuthority("ROLE_ENCARGADO", "ENCARGADO")
+                .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasAnyAuthority("ROLE_ENCARGADO", "ENCARGADO")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
