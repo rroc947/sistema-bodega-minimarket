@@ -27,6 +27,10 @@ export class ApiService {
     return this.http.post<Producto>(`${this.baseUrl}/productos`, producto);
   }
 
+  actualizarProducto(id: number, producto: Producto): Observable<Producto> {
+    return this.http.put<Producto>(`${this.baseUrl}/productos/${id}`, producto);
+  }
+
   eliminarProducto(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/productos/${id}`);
   }

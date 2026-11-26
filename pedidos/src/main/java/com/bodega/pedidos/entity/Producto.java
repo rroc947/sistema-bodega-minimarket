@@ -32,4 +32,6 @@ public class Producto {
     private Integer stock;
     
     private String categoria;
+
+    private String marca;
 }

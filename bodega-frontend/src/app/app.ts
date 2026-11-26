@@ -24,7 +24,9 @@ export class App implements OnInit {
 
   productos: Producto[] = [];
   ventas: any[] = [];
-  nuevoProducto: Producto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '' };
+  nuevoProducto: Producto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '', marca: '' };
+
+  editandoProducto: Producto | null = null;
 
   paginaActual: number = 0;
   tamanoPagina: number = 5;
@@ -123,12 +125,36 @@ export class App implements OnInit {
       return;
     }
     this.apiService.crearProducto(this.nuevoProducto).subscribe({
-      next: () => {
+      next: (res) => {
         this.cargarProductos();
-        this.nuevoProducto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '' };
-        alert('¡Producto guardado exitosamente!');
+        this.nuevoProducto = { nombre: '', precio: 0, stock: 0, descripcion: '', categoria: '', marca: '' };
+        alert(`¡Operación exitosa! Producto: ${res.nombre} (Stock actual: ${res.stock})`);
       },
       error: (err) => alert('Error al guardar: ' + (err.error?.message || err.error || 'Verifique los datos'))
+    });
+  }
+
+  iniciarEdicion(p: Producto) {
+    this.editandoProducto = { ...p };
+  }
+
+  cancelarEdicion() {
+    this.editandoProducto = null;
+  }
+
+  guardarEdicion() {
+    if (!this.editandoProducto || !this.editandoProducto.id) return;
+    if (!this.editandoProducto.nombre || !this.editandoProducto.precio || this.editandoProducto.precio <= 0) {
+      alert('El nombre y el precio deben ser válidos.');
+      return;
+    }
+    this.apiService.actualizarProducto(this.editandoProducto.id, this.editandoProducto).subscribe({
+      next: () => {
+        alert('¡Producto actualizado con éxito! (El stock no ha sido modificado)');
+        this.editandoProducto = null;
+        this.cargarProductos();
+      },
+      error: (err) => alert('Error al actualizar: ' + (err.error?.message || err.error || 'Verifique los datos'))
     });
   }
 

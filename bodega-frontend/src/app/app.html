@@ -85,11 +85,16 @@
 
       <!-- Formulario para Encargado -->
       <div *ngIf="currentUser?.rol === 'ROLE_ENCARGADO'" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-        <h3 style="margin-top: 0; color: #34495e; font-size: 16px; margin-bottom: 15px;">📦 Registrar Nuevo Producto (Solo Encargado)</h3>
-        <div style="display: grid; grid-template-columns: 2fr 1.5fr 2fr 1fr 1fr auto; gap: 12px; align-items: flex-end;">
+        <h3 style="margin-top: 0; color: #34495e; font-size: 16px; margin-bottom: 15px;">📦 Registrar / Recargar Producto (Solo Encargado)</h3>
+        <p style="color: #7f8c8d; font-size: 12px; margin-top: -8px; margin-bottom: 12px;"><i>💡 Si el producto ya existe con el mismo nombre, se sumará el stock ingresado.</i></p>
+        <div style="display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 2fr 1fr 1fr auto; gap: 12px; align-items: flex-end;">
           <div>
             <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Nombre del Producto:</label>
             <input [(ngModel)]="nuevoProducto.nombre" placeholder="Ej. Arroz Costeño 1kg" style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" />
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Marca:</label>
+            <input [(ngModel)]="nuevoProducto.marca" placeholder="Ej. Costeño" style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" />
           </div>
           <div>
             <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Categoría:</label>
@@ -104,11 +109,44 @@
             <input [(ngModel)]="nuevoProducto.precio" type="number" step="0.10" placeholder="0.00" style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" />
           </div>
           <div>
-            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Stock Inicial:</label>
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">Stock a Ingresar:</label>
             <input [(ngModel)]="nuevoProducto.stock" type="number" placeholder="0" style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" />
           </div>
           <div>
-            <button (click)="guardarProducto()" style="background: #27ae60; color: white; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; height: 36px; white-space: nowrap;">+ Guardar Producto</button>
+            <button (click)="guardarProducto()" style="background: #27ae60; color: white; border: none; padding: 10px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; height: 36px; white-space: nowrap;">+ Guardar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL DE EDICIÓN FLOTANTE -->
+      <div *ngIf="editandoProducto" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; border-radius: 8px; padding: 25px; width: 420px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+          <h3 style="margin-top: 0; color: #2c3e50;">✏️ Editar Producto #{{ editandoProducto.id }}</h3>
+          <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 15px;"><i>Nota: Por política de inventario, el stock no se edita aquí; solo se recarga registrando el producto.</i></p>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Nombre:</label>
+            <input [(ngModel)]="editandoProducto.nombre" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Precio (S/):</label>
+            <input [(ngModel)]="editandoProducto.precio" type="number" step="0.10" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Marca:</label>
+            <input [(ngModel)]="editandoProducto.marca" placeholder="Ej. Costeño" style="width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px;">Stock Actual (No editable):</label>
+            <input [value]="editandoProducto.stock + ' unidades'" disabled style="width: 100%; box-sizing: border-box; padding: 8px; background: #eee; border: 1px solid #ccc; border-radius: 4px; font-weight: bold;" />
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button (click)="cancelarEdicion()" style="background: #95a5a6; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer;">Cancelar</button>
+            <button (click)="guardarEdicion()" style="background: #2980b9; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer;">Guardar</button>
           </div>
         </div>
       </div>
@@ -119,6 +157,7 @@
           <tr style="background: #2c3e50; color: white; text-align: left;">
             <th style="padding: 12px;">ID</th>
             <th style="padding: 12px;">Nombre</th>
+            <th style="padding: 12px;">Marca</th>
             <th style="padding: 12px;">Categoría</th>
             <th style="padding: 12px;">Precio</th>
             <th style="padding: 12px;">Stock Actual</th>
@@ -129,10 +168,12 @@
           <tr *ngFor="let p of productos" style="border-bottom: 1px solid #eee;">
             <td style="padding: 12px;">{{ p.id }}</td>
             <td style="padding: 12px;">{{ p.nombre }}</td>
+            <td style="padding: 12px;">{{ p.marca || 'S/M' }}</td>
             <td style="padding: 12px;">{{ p.categoria }}</td>
             <td style="padding: 12px;">S/ {{ p.precio | number:'1.2-2' }}</td>
             <td style="padding: 12px;"><b>{{ p.stock }}</b> unidades</td>
-            <td *ngIf="currentUser?.rol === 'ROLE_CAJERO'" style="padding: 12px;">
+            <td *ngIf="currentUser?.rol === 'ROLE_ENCARGADO'" style="padding: 12px;">
+              <button (click)="iniciarEdicion(p)" style="background: #2980b9; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px;">Editar</button>
               <button (click)="eliminar(p.id!)" style="background: #c0392b; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Eliminar</button>
             </td>
           </tr>
